@@ -20,7 +20,8 @@
 
 <!-- PANEL -->
 <div id="panel" style="display:none;">
-  <button id="logoutBtn" class="logout">Cerrar sesión</button>
+  <!-- Botón de logout visible y destacado -->
+  <button id="logoutBtn" class="logout" style="position:absolute; top:20px; right:20px;">Cerrar sesión</button>
 
   <div id="controls">
     <h2>Configurar ruleta</h2>
@@ -47,7 +48,7 @@
 
   <p style="margin-top:20px;font-size:14px;color:#aaa;">
     🔗 Tu overlay listo para OBS:  
-    <a id="overlayLink" href="overlay.html" target="_blank">Abrir Overlay</a>
+    <button id="openOverlay">Abrir Overlay</button>
   </p>
 </div>
 
@@ -63,6 +64,9 @@
 
   const USER = "admin";
   const PASS = "1234";
+
+  // Overlay
+  let overlayWindow = null;
 
   // Si ya estaba logueado
   if(localStorage.getItem("loggedIn") === "true"){
@@ -83,13 +87,47 @@
   });
 
   // Logout
-  if(logoutBtn){
-    logoutBtn.addEventListener("click", ()=>{
-      localStorage.removeItem("loggedIn");
-      panelDiv.style.display = "none";
-      loginDiv.style.display = "flex";
-    });
+  logoutBtn.addEventListener("click", ()=>{
+    localStorage.removeItem("loggedIn");
+    panelDiv.style.display = "none";
+    loginDiv.style.display = "flex";
+    if(overlayWindow && !overlayWindow.closed) overlayWindow.close();
+  });
+
+  // Abrir overlay
+  const openOverlayBtn = document.getElementById("openOverlay");
+  openOverlayBtn.addEventListener("click", ()=>{
+    if(!overlayWindow || overlayWindow.closed){
+      overlayWindow = window.open("overlay.html", "Overlay", "width=420,height=440");
+    } else {
+      overlayWindow.focus();
+    }
+  });
+
+  // --- Enviar spin y actualización de opciones al overlay ---
+  const spinBtn = document.getElementById("spin");
+
+  function sendUpdateToOverlay(){
+    if(overlayWindow && !overlayWindow.closed){
+      const options = JSON.parse(localStorage.getItem("wheelOptions")) || [];
+      const settings = JSON.parse(localStorage.getItem("wheelSettings")) || {};
+      overlayWindow.postMessage({action:"update", options, settings}, "*");
+    }
   }
+
+  spinBtn.addEventListener("click", ()=>{
+    // Actualizar overlay antes de girar
+    sendUpdateToOverlay();
+    if(overlayWindow && !overlayWindow.closed){
+      overlayWindow.postMessage({action:"spin"}, "*");
+    }
+  });
+
+  // Enviar actualización al overlay cada vez que se modifiquen opciones o settings
+  document.getElementById("addOption").addEventListener("click", sendUpdateToOverlay);
+  document.getElementById("bgColor").addEventListener("change", sendUpdateToOverlay);
+  document.getElementById("transparentBg").addEventListener("change", sendUpdateToOverlay);
+  document.getElementById("solidColors").addEventListener("change", sendUpdateToOverlay);
 </script>
 
 </body>
