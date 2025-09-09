@@ -2,8 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Ruleta Overlay</title>
-<link rel="stylesheet" href="style.css">
+<title>Ruleta Overlay - LQISTUDIO</title>
 <style>
   html, body {
     margin: 0;
@@ -25,11 +24,16 @@
 </head>
 <body>
 <canvas id="wheel" width="400" height="400"></canvas>
+
 <script>
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
-let options = [];
+let options = [
+  { text: "Premio 1", color: "#e74c3c" },
+  { text: "Premio 2", color: "#3498db" },
+  { text: "Premio 3", color: "#2ecc71" }
+];
 let settings = { bgColor:"#000000", transparent:true, solidColors:true };
 
 let startAngle = 0;
@@ -52,8 +56,6 @@ function drawWheel(){
     ctx.fillStyle = settings.bgColor;
     ctx.fillRect(0,0,canvas.width,canvas.height);
   }
-
-  if(options.length === 0) return;
 
   const arc = (2*Math.PI)/options.length;
   options.forEach((opt,i)=>{
@@ -99,23 +101,19 @@ function rotateWheel(){
   if(spinning) requestAnimationFrame(rotateWheel);
 }
 
-// Escuchar mensajes desde panel
-window.addEventListener("message", event=>{
-  const data = event.data;
-  if(data.action === "update"){
-    options = data.options || [];
-    settings = data.settings || { bgColor:"#000", transparent:true, solidColors:true };
-    drawWheel();
-  }
-  if(data.action === "spin" && !spinning){
+// Para demo automática: girar cada 5s
+function autoSpinDemo(){
+  if(!spinning){
     spinVel = Math.random()*0.3 + 0.25;
     spinning = true;
     rotateWheel();
   }
-});
+  setTimeout(autoSpinDemo, 5000);
+}
 
-// Inicializar ruleta vacía
+// Inicializar
 drawWheel();
+autoSpinDemo();
 </script>
 </body>
 </html>
