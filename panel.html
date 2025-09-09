@@ -6,8 +6,11 @@
 <link rel="stylesheet" href="style.css">
 <style>
 body, html { margin:0; padding:0; font-family:Arial,sans-serif; }
-#panel { padding:20px; }
+#panel { padding:20px; position:relative; }
 #logoutBtn { position:absolute; top:20px; right:20px; padding:8px 16px; border:none; border-radius:5px; background:#e74c3c; color:#fff; cursor:pointer; }
+#controls { margin-bottom:20px; }
+#options div { margin-bottom:5px; }
+button { cursor:pointer; }
 </style>
 </head>
 <body>
@@ -38,37 +41,36 @@ body, html { margin:0; padding:0; font-family:Arial,sans-serif; }
 
 <script>
 document.addEventListener("DOMContentLoaded", function(){
+
   const logoutBtn = document.getElementById("logoutBtn");
   const openOverlayBtn = document.getElementById("openOverlay");
+  const spinBtn = document.getElementById("spin");
   let overlayWindow = null;
 
-  // Si no está logueado, redirigir al login
+  // --- Validar login ---
   if(localStorage.getItem("loggedIn") !== "true"){
     window.location.href = "login.html";
   }
 
-  // Logout
+  // --- Logout ---
   logoutBtn.addEventListener("click", ()=>{
     localStorage.removeItem("loggedIn");
     if(overlayWindow && !overlayWindow.closed) overlayWindow.close();
     window.location.href = "login.html";
   });
 
-  // Abrir overlay
+  // --- Abrir overlay ---
   openOverlayBtn.addEventListener("click", ()=>{
     if(!overlayWindow || overlayWindow.closed){
       overlayWindow = window.open("overlay.html","Overlay","width=420,height=440");
-      setTimeout(()=>{
-        if(overlayWindow) sendUpdateToOverlay();
-      },200);
+      setTimeout(()=> sendUpdateToOverlay(), 200); // dar tiempo a que cargue
     } else {
       overlayWindow.focus();
       sendUpdateToOverlay();
     }
   });
 
-  // Spin
-  const spinBtn = document.getElementById("spin");
+  // --- Spin desde panel ---
   if(spinBtn){
     spinBtn.addEventListener("click", ()=>{
       sendUpdateToOverlay();
@@ -78,13 +80,14 @@ document.addEventListener("DOMContentLoaded", function(){
     });
   }
 
-  // Función para enviar opciones/config al overlay
+  // --- Enviar opciones y settings al overlay ---
   function sendUpdateToOverlay(){
     if(!overlayWindow || overlayWindow.closed) return;
     const options = JSON.parse(localStorage.getItem("wheelOptions")) || [];
     const settings = JSON.parse(localStorage.getItem("wheelSettings")) || { bgColor:"#000000", transparent:true, solidColors:true };
     overlayWindow.postMessage({action:"update", options, settings}, "*");
   }
+
 });
 </script>
 
