@@ -72,13 +72,13 @@
   const loginMsg = document.getElementById("loginMsg");
   const logoutBtn = document.getElementById("logoutBtn");
   const openOverlayBtn = document.getElementById("openOverlay");
+  const spinBtn = document.getElementById("spin");
 
   const USER = "admin";
   const PASS = "1234";
 
   let overlayWindow = null;
 
-  // Mostrar panel solo cuando login es correcto
   function showPanel(){
     loginDiv.style.display = "none";
     panelDiv.style.display = "block";
@@ -107,13 +107,34 @@
     if(overlayWindow && !overlayWindow.closed) overlayWindow.close();
   });
 
+  // Enviar datos de la ruleta al overlay
+  function sendUpdateToOverlay(){
+    if(!overlayWindow || overlayWindow.closed) return;
+    const options = JSON.parse(localStorage.getItem("wheelOptions")) || [];
+    const settings = JSON.parse(localStorage.getItem("wheelSettings")) || { bgColor:"#000000", transparent:true, solidColors:true };
+    overlayWindow.postMessage({action:"update", options, settings}, "*");
+  }
+
   // Abrir overlay
   openOverlayBtn.addEventListener("click", ()=>{
     if(!overlayWindow || overlayWindow.closed){
       overlayWindow = window.open("overlay.html","Overlay","width=420,height=440");
-    } else overlayWindow.focus();
+      setTimeout(sendUpdateToOverlay, 200); // esperar a que cargue
+    } else {
+      overlayWindow.focus();
+      sendUpdateToOverlay();
+    }
   });
 
+  // Spin desde el panel hacia el overlay
+  if(spinBtn){
+    spinBtn.addEventListener("click", ()=>{
+      sendUpdateToOverlay(); // actualizar opciones antes de girar
+      if(overlayWindow && !overlayWindow.closed){
+        overlayWindow.postMessage({action:"spin"}, "*");
+      }
+    });
+  }
 </script>
 
 </body>
