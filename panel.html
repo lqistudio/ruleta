@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel - LQISTUDIO</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body, html { margin:0; padding:0; font-family:Arial,sans-serif; }
+#panel { padding:20px; }
+#logoutBtn { position:absolute; top:20px; right:20px; padding:8px 16px; border:none; border-radius:5px; background:#e74c3c; color:#fff; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div id="panel">
+  <button id="logoutBtn">Cerrar sesión</button>
+
+  <div id="controls">
+    <h2>Configurar ruleta</h2>
+    <div id="options"></div>
+    <button id="addOption">➕ Agregar opción</button>
+    <div id="settings">
+      <label>🎨 Color de fondo: <input type="color" id="bgColor" value="#000000"><input type="checkbox" id="transparentBg"> Transparente</label>
+      <label><input type="checkbox" id="solidColors" checked> Usar colores en los sectores</label>
+    </div>
+  </div>
+
+  <canvas id="wheel" width="400" height="400"></canvas>
+  <button id="spin">🎯 Girar</button>
+  <div id="result"></div>
+
+  <p style="margin-top:20px;font-size:14px;color:#aaa;">
+    🔗 Overlay OBS: <button id="openOverlay">Abrir Overlay</button>
+  </p>
+</div>
+
+<script src="app.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  const logoutBtn = document.getElementById("logoutBtn");
+  const openOverlayBtn = document.getElementById("openOverlay");
+  let overlayWindow = null;
+
+  // Si no está logueado, redirigir al login
+  if(localStorage.getItem("loggedIn") !== "true"){
+    window.location.href = "login.html";
+  }
+
+  // Logout
+  logoutBtn.addEventListener("click", ()=>{
+    localStorage.removeItem("loggedIn");
+    if(overlayWindow && !overlayWindow.closed) overlayWindow.close();
+    window.location.href = "login.html";
+  });
+
+  // Abrir overlay
+  openOverlayBtn.addEventListener("click", ()=>{
+    if(!overlayWindow || overlayWindow.closed){
+      overlayWindow = window.open("overlay.html","Overlay","width=420,height=440");
+      setTimeout(()=>{
+        if(overlayWindow) sendUpdateToOverlay();
+      },200);
+    } else {
+      overlayWindow.focus();
+      sendUpdateToOverlay();
+    }
+  });
+
+  // Spin
+  const spinBtn = document.getElementById("spin");
+  if(spinBtn){
+    spinBtn.addEventListener("click", ()=>{
+      sendUpdateToOverlay();
+      if(overlayWindow && !overlayWindow.closed){
+        overlayWindow.postMessage({action:"spin"}, "*");
+      }
+    });
+  }
+
+  // Función para enviar opciones/config al overlay
+  function sendUpdateToOverlay(){
+    if(!overlayWindow || overlayWindow.closed) return;
+    const options = JSON.parse(localStorage.getItem("wheelOptions")) || [];
+    const settings = JSON.parse(localStorage.getItem("wheelSettings")) || { bgColor:"#000000", transparent:true, solidColors:true };
+    overlayWindow.postMessage({action:"update", options, settings}, "*");
+  }
+});
+</script>
+
+</body>
+</html>
