@@ -6,33 +6,73 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="controls">
-    <h2>Configurar ruleta</h2>
-    <div id="options"></div>
-    <button id="addOption">➕ Agregar opción</button>
-
-    <div id="settings">
-      <label>
-        🎨 Color de fondo:
-        <input type="color" id="bgColor" value="#000000">
-        <input type="checkbox" id="transparentBg"> Transparente
-      </label>
-
-      <label>
-        <input type="checkbox" id="solidColors" checked>
-        Usar colores en los sectores
-      </label>
-    </div>
+  <div id="login">
+    <h2>🔑 Iniciar Sesión</h2>
+    <input type="text" id="username" placeholder="Usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button id="loginBtn">Entrar</button>
+    <p id="loginMsg"></p>
   </div>
 
-  <canvas id="wheel" width="400" height="400"></canvas>
-  <button id="spin">🎯 Girar</button>
-  <div id="result"></div>
+  <div id="panel" style="display:none;">
+    <div id="controls">
+      <h2>Configurar ruleta</h2>
+      <div id="options"></div>
+      <button id="addOption">➕ Agregar opción</button>
 
-  <p style="margin-top:20px;font-size:14px;color:#aaa;">
-    🔗 Para usar en OBS abre: <b>overlay.html</b>
-  </p>
+      <div id="settings">
+        <label>
+          🎨 Color de fondo:
+          <input type="color" id="bgColor" value="#000000">
+          <input type="checkbox" id="transparentBg"> Transparente
+        </label>
+
+        <label>
+          <input type="checkbox" id="solidColors" checked>
+          Usar colores en los sectores
+        </label>
+      </div>
+    </div>
+
+    <canvas id="wheel" width="400" height="400"></canvas>
+    <button id="spin">🎯 Girar</button>
+    <div id="result"></div>
+
+    <p style="margin-top:20px;font-size:14px;color:#aaa;">
+      🔗 Tu overlay listo para OBS:  
+      <a id="overlayLink" href="overlay.html" target="_blank">Abrir Overlay</a>
+    </p>
+  </div>
 
   <script src="app.js"></script>
+  <script>
+    // --- Login básico ---
+    const loginDiv = document.getElementById("login");
+    const panelDiv = document.getElementById("panel");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginMsg = document.getElementById("loginMsg");
+
+    // Usuario demo (puedes cambiarlo o mejorarlo con OAuth)
+    const USER = "admin";
+    const PASS = "1234";
+
+    // Si ya logueó antes
+    if(localStorage.getItem("loggedIn") === "true"){
+      loginDiv.style.display = "none";
+      panelDiv.style.display = "block";
+    }
+
+    loginBtn.addEventListener("click", ()=>{
+      const u = document.getElementById("username").value;
+      const p = document.getElementById("password").value;
+      if(u === USER && p === PASS){
+        localStorage.setItem("loggedIn", "true");
+        loginDiv.style.display = "none";
+        panelDiv.style.display = "block";
+      } else {
+        loginMsg.textContent = "❌ Usuario o contraseña incorrectos";
+      }
+    });
+  </script>
 </body>
 </html>
