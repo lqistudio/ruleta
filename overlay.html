@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ruleta Overlay</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #controls, #result {
+      display: none; /* ocultamos controles y resultado */
+    }
+    body {
+      background: transparent; /* obligatorio para OBS */
+    }
+  </style>
+</head>
+<body>
+  <canvas id="wheel" width="400" height="400"></canvas>
+  <button id="spin">🎯</button>
+
+  <script src="app.js"></script>
+</body>
+</html>
