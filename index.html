@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Ruleta Configuración - LQISTUDIO</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body, html { margin:0; padding:0; font-family:Arial,sans-serif; height:100%; }
-    #login { display:flex; justify-content:center; align-items:center; height:100vh; }
-    .login-container { background:#222; padding:30px; border-radius:10px; color:#fff; text-align:center; }
-    .login-container input { display:block; width:200px; margin:10px auto; padding:8px; border-radius:5px; border:none; }
-    .login-container button { padding:8px 16px; border:none; border-radius:5px; background:#3498db; color:#fff; cursor:pointer; }
-    #panel { display:none; position:relative; padding:20px; }
-    #logoutBtn { position:absolute; top:20px; right:20px; padding:8px 16px; border:none; border-radius:5px; background:#e74c3c; color:#fff; cursor:pointer; }
-    #controls { margin-bottom:20px; }
-    #options div { margin-bottom:5px; }
-  </style>
+<meta charset="UTF-8">
+<title>Ruleta Configuración - LQISTUDIO</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body, html { margin:0; padding:0; font-family:Arial,sans-serif; height:100%; }
+  #login { display:flex; justify-content:center; align-items:center; height:100vh; }
+  .login-container { background:#222; padding:30px; border-radius:10px; color:#fff; text-align:center; }
+  .login-container input { display:block; width:200px; margin:10px auto; padding:8px; border-radius:5px; border:none; }
+  .login-container button { padding:8px 16px; border:none; border-radius:5px; background:#3498db; color:#fff; cursor:pointer; }
+  #panel { display:none; position:relative; padding:20px; }
+  #logoutBtn { position:absolute; top:20px; right:20px; padding:8px 16px; border:none; border-radius:5px; background:#e74c3c; color:#fff; cursor:pointer; }
+  #controls { margin-bottom:20px; }
+  #options div { margin-bottom:5px; }
+</style>
 </head>
 <body>
 
@@ -66,6 +66,7 @@
 <script src="app.js"></script>
 
 <script>
+  // --- LOGIN / LOGOUT ---
   const loginDiv = document.getElementById("login");
   const panelDiv = document.getElementById("panel");
   const loginBtn = document.getElementById("loginBtn");
@@ -89,10 +90,11 @@
     showPanel();
   }
 
+  // Login
   loginBtn.addEventListener("click", ()=>{
     const u = document.getElementById("username").value.trim();
     const p = document.getElementById("password").value.trim();
-    if(u===USER && p===PASS){
+    if(u === USER && p === PASS){
       localStorage.setItem("loggedIn","true");
       showPanel();
     } else {
@@ -100,6 +102,7 @@
     }
   });
 
+  // Logout
   logoutBtn.addEventListener("click", ()=>{
     localStorage.removeItem("loggedIn");
     panelDiv.style.display="none";
@@ -107,7 +110,7 @@
     if(overlayWindow && !overlayWindow.closed) overlayWindow.close();
   });
 
-  // Enviar datos de la ruleta al overlay
+  // --- Overlay ---
   function sendUpdateToOverlay(){
     if(!overlayWindow || overlayWindow.closed) return;
     const options = JSON.parse(localStorage.getItem("wheelOptions")) || [];
@@ -119,17 +122,17 @@
   openOverlayBtn.addEventListener("click", ()=>{
     if(!overlayWindow || overlayWindow.closed){
       overlayWindow = window.open("overlay.html","Overlay","width=420,height=440");
-      setTimeout(sendUpdateToOverlay, 200); // esperar a que cargue
+      setTimeout(sendUpdateToOverlay,200);
     } else {
       overlayWindow.focus();
       sendUpdateToOverlay();
     }
   });
 
-  // Spin desde el panel hacia el overlay
+  // Spin desde panel
   if(spinBtn){
     spinBtn.addEventListener("click", ()=>{
-      sendUpdateToOverlay(); // actualizar opciones antes de girar
+      sendUpdateToOverlay();
       if(overlayWindow && !overlayWindow.closed){
         overlayWindow.postMessage({action:"spin"}, "*");
       }
