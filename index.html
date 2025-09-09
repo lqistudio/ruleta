@@ -2,77 +2,95 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Ruleta Configuración</title>
+  <title>Ruleta Configuración - LQISTUDIO</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="login">
-    <h2>🔑 Iniciar Sesión</h2>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-container">
+    <h1>Bienvenido al Salón de Pruebas de LQISTUDIO</h1>
     <input type="text" id="username" placeholder="Usuario">
     <input type="password" id="password" placeholder="Contraseña">
     <button id="loginBtn">Entrar</button>
     <p id="loginMsg"></p>
   </div>
+</div>
 
-  <div id="panel" style="display:none;">
-    <div id="controls">
-      <h2>Configurar ruleta</h2>
-      <div id="options"></div>
-      <button id="addOption">➕ Agregar opción</button>
+<!-- PANEL -->
+<div id="panel" style="display:none;">
+  <button id="logoutBtn" class="logout">Cerrar sesión</button>
 
-      <div id="settings">
-        <label>
-          🎨 Color de fondo:
-          <input type="color" id="bgColor" value="#000000">
-          <input type="checkbox" id="transparentBg"> Transparente
-        </label>
+  <div id="controls">
+    <h2>Configurar ruleta</h2>
+    <div id="options"></div>
+    <button id="addOption">➕ Agregar opción</button>
 
-        <label>
-          <input type="checkbox" id="solidColors" checked>
-          Usar colores en los sectores
-        </label>
-      </div>
+    <div id="settings">
+      <label>
+        🎨 Color de fondo:
+        <input type="color" id="bgColor" value="#000000">
+        <input type="checkbox" id="transparentBg"> Transparente
+      </label>
+
+      <label>
+        <input type="checkbox" id="solidColors" checked>
+        Usar colores en los sectores
+      </label>
     </div>
-
-    <canvas id="wheel" width="400" height="400"></canvas>
-    <button id="spin">🎯 Girar</button>
-    <div id="result"></div>
-
-    <p style="margin-top:20px;font-size:14px;color:#aaa;">
-      🔗 Tu overlay listo para OBS:  
-      <a id="overlayLink" href="overlay.html" target="_blank">Abrir Overlay</a>
-    </p>
   </div>
 
-  <script src="app.js"></script>
-  <script>
-    // --- Login básico ---
-    const loginDiv = document.getElementById("login");
-    const panelDiv = document.getElementById("panel");
-    const loginBtn = document.getElementById("loginBtn");
-    const loginMsg = document.getElementById("loginMsg");
+  <canvas id="wheel" width="400" height="400"></canvas>
+  <button id="spin">🎯 Girar</button>
+  <div id="result"></div>
 
-    // Usuario demo (puedes cambiarlo o mejorarlo con OAuth)
-    const USER = "admin";
-    const PASS = "1234";
+  <p style="margin-top:20px;font-size:14px;color:#aaa;">
+    🔗 Tu overlay listo para OBS:  
+    <a id="overlayLink" href="overlay.html" target="_blank">Abrir Overlay</a>
+  </p>
+</div>
 
-    // Si ya logueó antes
-    if(localStorage.getItem("loggedIn") === "true"){
+<script src="app.js"></script>
+
+<script>
+  // --- LOGIN y LOGOUT ---
+  const loginDiv = document.getElementById("login");
+  const panelDiv = document.getElementById("panel");
+  const loginBtn = document.getElementById("loginBtn");
+  const loginMsg = document.getElementById("loginMsg");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  const USER = "admin";
+  const PASS = "1234";
+
+  // Si ya estaba logueado
+  if(localStorage.getItem("loggedIn") === "true"){
+    loginDiv.style.display = "none";
+    panelDiv.style.display = "block";
+  }
+
+  loginBtn.addEventListener("click", ()=>{
+    const u = document.getElementById("username").value;
+    const p = document.getElementById("password").value;
+    if(u === USER && p === PASS){
+      localStorage.setItem("loggedIn","true");
       loginDiv.style.display = "none";
       panelDiv.style.display = "block";
+    } else {
+      loginMsg.textContent = "❌ Usuario o contraseña incorrectos";
     }
+  });
 
-    loginBtn.addEventListener("click", ()=>{
-      const u = document.getElementById("username").value;
-      const p = document.getElementById("password").value;
-      if(u === USER && p === PASS){
-        localStorage.setItem("loggedIn", "true");
-        loginDiv.style.display = "none";
-        panelDiv.style.display = "block";
-      } else {
-        loginMsg.textContent = "❌ Usuario o contraseña incorrectos";
-      }
+  // Logout
+  if(logoutBtn){
+    logoutBtn.addEventListener("click", ()=>{
+      localStorage.removeItem("loggedIn");
+      panelDiv.style.display = "none";
+      loginDiv.style.display = "flex";
     });
-  </script>
+  }
+</script>
+
 </body>
 </html>
