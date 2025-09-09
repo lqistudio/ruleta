@@ -1,7 +1,7 @@
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
-// Cargar opciones y settings desde localStorage o usar defaults
+// Cargar opciones y settings desde localStorage
 let options = JSON.parse(localStorage.getItem("wheelOptions")) || [
   { text: "Premio 1", color: "#e74c3c" },
   { text: "Premio 2", color: "#3498db" },
@@ -15,12 +15,12 @@ let settings = JSON.parse(localStorage.getItem("wheelSettings")) || {
 };
 
 let startAngle = 0;
+let spinning = false;
+let spinVel = 0;
 
-// Dibujar ruleta
-function drawWheel() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function drawWheel(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // fondo
   if(!settings.transparent){
     ctx.fillStyle = settings.bgColor;
     ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -59,19 +59,24 @@ function drawWheel() {
   ctx.fill();
 }
 
-// --- Animación de giro (opcional) ---
-let spinAngle = 0;
-let spinVel = Math.random()*0.3+0.25; // giro inicial automático
-
+// Girar ruleta
 function rotateWheel(){
-  spinAngle += spinVel;
-  spinVel *= 0.985; // frena lentamente
-  if(spinVel < 0.002) spinVel = 0; // detener
-  startAngle = spinAngle;
+  if(!spinning) return;
+  startAngle += spinVel;
+  spinVel *= 0.985;
+  if(spinVel<0.002) spinning=false;
   drawWheel();
-  requestAnimationFrame(rotateWheel);
+  if(spinning) requestAnimationFrame(rotateWheel);
 }
 
-// iniciar animación
+// Escuchar mensaje desde panel
+window.addEventListener("message", (event)=>{
+  if(event.data.action === "spin" && !spinning){
+    spinVel = Math.random()*0.3+0.25;
+    spinning = true;
+    rotateWheel();
+  }
+});
+
+// Inicializar overlay
 drawWheel();
-rotateWheel();
