@@ -5,12 +5,42 @@
 <title>Ruleta Overlay</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  body { background: transparent; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-  canvas { display: block; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent; /* Transparencia para OBS */
+    overflow: hidden;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  canvas {
+    display: block;
+  }
 </style>
 </head>
 <body>
 <canvas id="wheel" width="400" height="400"></canvas>
 <script src="overlay.js"></script>
+<script>
+  // Enviar un mensaje de confirmación al panel (opcional)
+  window.addEventListener("load", () => {
+    console.log("Overlay cargado y listo para recibir mensajes.");
+  });
+
+  // Asegurarnos que el canvas se ajuste a la ventana si quieres
+  const canvas = document.getElementById("wheel");
+  canvas.width = window.innerWidth < 400 ? window.innerWidth : 400;
+  canvas.height = canvas.width; // mantener cuadrado
+
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth < 400 ? window.innerWidth : 400;
+    canvas.height = canvas.width;
+  });
+</script>
 </body>
 </html>
