@@ -2,9 +2,9 @@ const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 const spinBtn = document.getElementById("spin");
 const resultDiv = document.getElementById("result");
+
 const optionsDiv = document.getElementById("options");
 const addOptionBtn = document.getElementById("addOption");
-
 const bgColorInput = document.getElementById("bgColor");
 const transparentBgCheck = document.getElementById("transparentBg");
 const solidColorsCheck = document.getElementById("solidColors");
@@ -21,9 +21,10 @@ let settings = JSON.parse(localStorage.getItem("wheelSettings")) || {
   solidColors: true
 };
 
-bgColorInput.value = settings.bgColor;
-transparentBgCheck.checked = settings.transparent;
-solidColorsCheck.checked = settings.solidColors;
+// Configurar inputs solo si existen
+if (bgColorInput) bgColorInput.value = settings.bgColor;
+if (transparentBgCheck) transparentBgCheck.checked = settings.transparent;
+if (solidColorsCheck) solidColorsCheck.checked = settings.solidColors;
 
 function saveOptions() {
   localStorage.setItem("wheelOptions", JSON.stringify(options));
@@ -31,6 +32,8 @@ function saveOptions() {
 }
 
 function saveSettings() {
+  if (!bgColorInput || !transparentBgCheck || !solidColorsCheck) return;
+
   settings = {
     bgColor: bgColorInput.value,
     transparent: transparentBgCheck.checked,
@@ -41,6 +44,7 @@ function saveSettings() {
 }
 
 function renderOptions() {
+  if (!optionsDiv) return;
   optionsDiv.innerHTML = "";
   options.forEach((opt, i) => {
     const div = document.createElement("div");
@@ -70,15 +74,19 @@ window.removeOption = (i) => {
   renderOptions();
 };
 
-addOptionBtn.addEventListener("click", () => {
-  options.push({ text: "Nuevo", color: "#ffffff" });
-  saveOptions();
-  renderOptions();
-});
+// Agregar opción solo si el botón existe
+if (addOptionBtn) {
+  addOptionBtn.addEventListener("click", () => {
+    options.push({ text: "Nuevo", color: "#ffffff" });
+    saveOptions();
+    renderOptions();
+  });
+}
 
-bgColorInput.addEventListener("change", saveSettings);
-transparentBgCheck.addEventListener("change", saveSettings);
-solidColorsCheck.addEventListener("change", saveSettings);
+// Escuchar cambios de settings solo si existen
+if (bgColorInput) bgColorInput.addEventListener("change", saveSettings);
+if (transparentBgCheck) transparentBgCheck.addEventListener("change", saveSettings);
+if (solidColorsCheck) solidColorsCheck.addEventListener("change", saveSettings);
 
 let startAngle = 0;
 function drawWheel() {
@@ -113,6 +121,7 @@ function drawWheel() {
     ctx.restore();
   });
 
+  // Flecha superior
   ctx.beginPath();
   ctx.fillStyle = "#fff";
   ctx.moveTo(200, 0);
@@ -134,20 +143,23 @@ function rotateWheel() {
     spinning = false;
     const arc = (2 * Math.PI) / options.length;
     let index = Math.floor(((2 * Math.PI) - (spinAngle % (2 * Math.PI))) / arc) % options.length;
-    resultDiv.textContent = "Ganaste: " + options[index].text;
+    if (resultDiv) resultDiv.textContent = "Ganaste: " + options[index].text;
   }
   startAngle = spinAngle;
   drawWheel();
   requestAnimationFrame(rotateWheel);
 }
 
-spinBtn.addEventListener("click", () => {
-  if (spinning || options.length === 0) return;
-  spinVel = Math.random() * 0.3 + 0.25;
-  spinning = true;
-  rotateWheel();
-  resultDiv.textContent = "";
-});
+if (spinBtn) {
+  spinBtn.addEventListener("click", () => {
+    if (spinning || options.length === 0) return;
+    spinVel = Math.random() * 0.3 + 0.25;
+    spinning = true;
+    rotateWheel();
+    if (resultDiv) resultDiv.textContent = "";
+  });
+}
 
+// Render inicial
 renderOptions();
 drawWheel();
