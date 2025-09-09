@@ -2,143 +2,21 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Ruleta Configuración - LQISTUDIO</title>
-<link rel="stylesheet" href="style.css">
-<style>
-  body, html { margin:0; padding:0; font-family:Arial,sans-serif; height:100%; }
-  #login { display:flex; justify-content:center; align-items:center; height:100vh; }
-  .login-container { background:#222; padding:30px; border-radius:10px; color:#fff; text-align:center; }
-  .login-container input { display:block; width:200px; margin:10px auto; padding:8px; border-radius:5px; border:none; }
-  .login-container button { padding:8px 16px; border:none; border-radius:5px; background:#3498db; color:#fff; cursor:pointer; }
-  #panel { display:none; position:relative; padding:20px; }
-  #logoutBtn { position:absolute; top:20px; right:20px; padding:8px 16px; border:none; border-radius:5px; background:#e74c3c; color:#fff; cursor:pointer; }
-  #controls { margin-bottom:20px; }
-  #options div { margin-bottom:5px; }
-</style>
+<title>LQISTUDIO - Contenedor</title>
+<script>
+  // Revisar login y redirigir
+  document.addEventListener("DOMContentLoaded", ()=>{
+    if(localStorage.getItem("loggedIn") === "true"){
+      // Si está logueado, abrir panel
+      window.location.href = "panel.html";
+    } else {
+      // Si no, ir al login
+      window.location.href = "login.html";
+    }
+  });
+</script>
 </head>
 <body>
-
-<!-- LOGIN -->
-<div id="login">
-  <div class="login-container">
-    <h1>Bienvenido al Salón de Pruebas de LQISTUDIO</h1>
-    <input type="text" id="username" placeholder="Usuario">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button id="loginBtn">Entrar</button>
-    <p id="loginMsg"></p>
-  </div>
-</div>
-
-<!-- PANEL -->
-<div id="panel">
-  <button id="logoutBtn">Cerrar sesión</button>
-
-  <div id="controls">
-    <h2>Configurar ruleta</h2>
-    <div id="options"></div>
-    <button id="addOption">➕ Agregar opción</button>
-
-    <div id="settings">
-      <label>
-        🎨 Color de fondo:
-        <input type="color" id="bgColor" value="#000000">
-        <input type="checkbox" id="transparentBg"> Transparente
-      </label>
-
-      <label>
-        <input type="checkbox" id="solidColors" checked>
-        Usar colores en los sectores
-      </label>
-    </div>
-  </div>
-
-  <canvas id="wheel" width="400" height="400"></canvas>
-  <button id="spin">🎯 Girar</button>
-  <div id="result"></div>
-
-  <p style="margin-top:20px;font-size:14px;color:#aaa;">
-    🔗 Tu overlay listo para OBS:  
-    <button id="openOverlay">Abrir Overlay</button>
-  </p>
-</div>
-
-<!-- App.js -->
-<script src="app.js"></script>
-
-<script>
-  // --- LOGIN / LOGOUT ---
-  const loginDiv = document.getElementById("login");
-  const panelDiv = document.getElementById("panel");
-  const loginBtn = document.getElementById("loginBtn");
-  const loginMsg = document.getElementById("loginMsg");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const openOverlayBtn = document.getElementById("openOverlay");
-  const spinBtn = document.getElementById("spin");
-
-  const USER = "admin";
-  const PASS = "1234";
-
-  let overlayWindow = null;
-
-  function showPanel(){
-    loginDiv.style.display = "none";
-    panelDiv.style.display = "block";
-  }
-
-  // Revisar si ya estaba logueado
-  if(localStorage.getItem("loggedIn") === "true"){
-    showPanel();
-  }
-
-  // Login
-  loginBtn.addEventListener("click", ()=>{
-    const u = document.getElementById("username").value.trim();
-    const p = document.getElementById("password").value.trim();
-    if(u === USER && p === PASS){
-      localStorage.setItem("loggedIn","true");
-      showPanel();
-    } else {
-      loginMsg.textContent = "❌ Usuario o contraseña incorrectos";
-    }
-  });
-
-  // Logout
-  logoutBtn.addEventListener("click", ()=>{
-    localStorage.removeItem("loggedIn");
-    panelDiv.style.display="none";
-    loginDiv.style.display="flex";
-    if(overlayWindow && !overlayWindow.closed) overlayWindow.close();
-  });
-
-  // --- Overlay ---
-  function sendUpdateToOverlay(){
-    if(!overlayWindow || overlayWindow.closed) return;
-    const options = JSON.parse(localStorage.getItem("wheelOptions")) || [];
-    const settings = JSON.parse(localStorage.getItem("wheelSettings")) || { bgColor:"#000000", transparent:true, solidColors:true };
-    overlayWindow.postMessage({action:"update", options, settings}, "*");
-  }
-
-  // Abrir overlay
-  openOverlayBtn.addEventListener("click", ()=>{
-    if(!overlayWindow || overlayWindow.closed){
-      overlayWindow = window.open("overlay.html","Overlay","width=420,height=440");
-      setTimeout(sendUpdateToOverlay,200);
-    } else {
-      overlayWindow.focus();
-      sendUpdateToOverlay();
-    }
-  });
-
-  // Spin desde panel
-  if(spinBtn){
-    spinBtn.addEventListener("click", ()=>{
-      sendUpdateToOverlay();
-      if(overlayWindow && !overlayWindow.closed){
-        overlayWindow.postMessage({action:"spin"}, "*");
-      }
-    });
-  }
-</script>
-
+<p>Redirigiendo...</p>
 </body>
 </html>
