@@ -1,12 +1,8 @@
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
-// Opciones y configuración por defecto
-let options = [
-  { text: "Premio 1", color: "#e74c3c" },
-  { text: "Premio 2", color: "#3498db" },
-  { text: "Premio 3", color: "#2ecc71" }
-];
+// Overlay inicia vacío
+let options = [];
 let settings = { bgColor:"#000000", transparent:true, solidColors:true };
 
 let startAngle = 0;
@@ -25,7 +21,6 @@ window.addEventListener("resize", resizeCanvas);
 function drawWheel(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // Fondo
   if(!settings.transparent){
     ctx.fillStyle = settings.bgColor;
     ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -37,7 +32,6 @@ function drawWheel(){
   options.forEach((opt,i)=>{
     const angle = startAngle + i*arc;
 
-    // Sector
     ctx.beginPath();
     ctx.moveTo(canvas.width/2, canvas.height/2);
     ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2, angle, angle+arc);
@@ -48,7 +42,6 @@ function drawWheel(){
     ctx.fill();
     ctx.stroke();
 
-    // Texto
     ctx.save();
     ctx.translate(canvas.width/2, canvas.height/2);
     ctx.rotate(angle + arc/2);
@@ -81,20 +74,21 @@ function rotateWheel(){
   if(spinning) requestAnimationFrame(rotateWheel);
 }
 
-// Escuchar mensajes desde el panel
+// Recibir mensajes del panel
 window.addEventListener("message", event => {
   const data = event.data;
   if(data.action === "update"){
-    options = data.options || options;
-    settings = data.settings || settings;
+    options = data.options || [];
+    settings = data.settings || { bgColor:"#000000", transparent:true, solidColors:true };
     drawWheel();
   }
   if(data.action === "spin" && !spinning){
+    if(options.length === 0) return; // no girar si no hay opciones
     spinVel = Math.random()*0.3 + 0.25;
     spinning = true;
     rotateWheel();
   }
 });
 
-// Inicializar ruleta
+// Inicializar vacío
 drawWheel();
